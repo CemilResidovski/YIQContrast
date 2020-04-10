@@ -1,0 +1,24 @@
+{
+  "name" : "YIQ Contrast Finder",
+  "description" : "Change the fill color of foreground text depending on background object color according to YIQ contrast: https://24ways.org/2010/calculating-color-contrast/",
+  "host" : {
+    "app" : "XD",
+    "minVersion" : "21.0"
+  },
+  "id" : "08a5ab50",
+  "icons" : [ {
+    "path" : "images/icon@1x.png",
+    "width" : 24,
+    "height" : 24
+  }, {
+    "path" : "images/icon@2x.png",
+    "width" : 48,
+    "height" : 48
+  } ],
+  "uiEntryPoints" : [ {
+    "label" : "Change text color according to YIQ",
+    "type" : "menu",
+    "commandId" : "yiqContraster"
+  } ],
+  "version" : "0.0.1"
+}
