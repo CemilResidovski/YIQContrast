@@ -26,7 +26,7 @@
  */
 
 
-const {Rectangle, Text, Color} = require("scenegraph"); 
+const {Rectangle, Polygon, Ellipse, Text, Color} = require("scenegraph"); 
 
 function yiqContrastFunction(selection) { 
      if (selection.items.length < 2 || selection.items.length > 2) {
@@ -37,6 +37,7 @@ function yiqContrastFunction(selection) {
         if (!checkFillType(obj1.fill, obj2.fill)) {
 			return;
 		} else if (!checkObjectTypes(obj1, obj2)) {
+            console.log("checkObjectTypes failed");
 			return showOnboarding();
 		}
 		
@@ -88,25 +89,45 @@ function checkFillType(color1, color2) {
     return true;
 }
 
+// TODO: I tried refactoring away obj_text, but Ellipse and Polygon worked as inputs, so fix that
 function checkObjectTypes(obj1, obj2) {
 	var obj1_text = false;
-	var obj2_text = false;
-	if (obj1 instanceof Text) {
-		obj1_text = true;
-	} else if (!(obj1 instanceof Rectangle)) {
-		return false;
-	}
-	
-	if (obj2 instanceof Text) {
-		obj2_text = true;
-	} else if (!(obj2 instanceof Rectangle)) {
-		return false;
+    var obj2_text = false;
+    
+	if (isText(obj1)) {
+        obj1_text = true;
+
+        if (!(isBackgroundObj(obj2))) {
+            return false;
+        }
+	} else if (isText(obj2)) {
+        obj2_text = true;
+
+        if (!(isBackgroundObj(obj1))) {
+            return false;
+        }
 	}
 	
 	if (!(obj1_text ^ obj2_text)) {
 		return false;
 	}
-	return true;
+    return true;
+}
+
+function isBackgroundObj(obj) {
+    // if  (obj instanceof Rectangle ||
+    //     obj instanceof Polygon ||
+    //     obj instanceof Ellipse) {
+    //     return true;
+    // }
+    // return false;
+    return (obj instanceof Rectangle ||
+        obj instanceof Polygon ||
+        obj instanceof Ellipse);
+}
+
+function isText(obj) {
+    return (obj instanceof Text);
 }
 
 function getTextObjectIndex(obj1, obj2) {
