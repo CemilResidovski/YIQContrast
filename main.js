@@ -33,11 +33,10 @@ function yiqContrastFunction(selection) {
         return showOnboarding();
 	} else if (selection.items.length === 2) {
 		var obj1 = selection.items[0];
-		var obj2 = selection.items[1];
+        var obj2 = selection.items[1];
         if (!checkFillType(obj1.fill, obj2.fill)) {
 			return;
 		} else if (!checkObjectTypes(obj1, obj2)) {
-            console.log("checkObjectTypes failed");
 			return showOnboarding();
 		}
 		
@@ -55,7 +54,8 @@ function showOnboarding() {
         <form method="dialog">
             <h1>YIQ Contrast Finder</h1>
             <hr>
-            <div>Select a text object and a solid-filled rectangle. <\ br> This plugin will automatically change the fill color of the text according to YIQ.</div>
+            <div>Select a text object and a solid-filled figure (like rectangle, ellipse, or polygon).</div>
+            <div>This plugin will automatically change the fill color of the text - according to YIQ - depending on the color of the figure.</div>
             <footer>
                 <button id="ok" type="submit" uxp-variant="cta">OK</button>
             </footer>
@@ -89,38 +89,11 @@ function checkFillType(color1, color2) {
     return true;
 }
 
-// TODO: I tried refactoring away obj_text, but Ellipse and Polygon worked as inputs, so fix that
 function checkObjectTypes(obj1, obj2) {
-	var obj1_text = false;
-    var obj2_text = false;
-    
-	if (isText(obj1)) {
-        obj1_text = true;
-
-        if (!(isBackgroundObj(obj2))) {
-            return false;
-        }
-	} else if (isText(obj2)) {
-        obj2_text = true;
-
-        if (!(isBackgroundObj(obj1))) {
-            return false;
-        }
-	}
-	
-	if (!(obj1_text ^ obj2_text)) {
-		return false;
-	}
-    return true;
+    return (isText(obj1) && isBackgroundObj(obj2)) || (isBackgroundObj(obj1) && isText(obj2));
 }
 
 function isBackgroundObj(obj) {
-    // if  (obj instanceof Rectangle ||
-    //     obj instanceof Polygon ||
-    //     obj instanceof Ellipse) {
-    //     return true;
-    // }
-    // return false;
     return (obj instanceof Rectangle ||
         obj instanceof Polygon ||
         obj instanceof Ellipse);
