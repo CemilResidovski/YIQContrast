@@ -2,11 +2,11 @@
 Adobe XD plugin to automatically change the text fill color to get the best contrast according to YIQ:
 https://24ways.org/2010/calculating-color-contrast/
 
-Just select a text object and the background rectangle, run the plugin, and the plugin will change the color of the text to either black or white.
+Just select a text object and the background object (Rectangle/Ellipse/Polygon), run the plugin, and the plugin will change the color of the text to either black or white.
 
-Assumes that the text object is on top of a solid-filled rectangle.
+Assumes that the text object is on top of a solid-filled object.
 
-If the text is on an image, try to average out the color of the image into a solid-filled rectangle.
+If the text is on an image, try to average out the color of the image into a solid-filled object.
 
 For any issues/bugs/enhancement ideas, please visit https://github.com/CemilResidovski/YIQContrast/issues
 
