@@ -26,26 +26,54 @@
  */
 
 
-const {Rectangle, Polygon, Ellipse, Text, Color} = require("scenegraph"); 
+const {Rectangle, Polygon, Ellipse, Text, Color, LinearGradientFill } = require("scenegraph"); 
 
 function yiqContrastFunction(selection) { 
      if (selection.items.length < 2 || selection.items.length > 2) {
         return showOnboarding();
 	} else if (selection.items.length === 2) {
-		var obj1 = selection.items[0];
-        var obj2 = selection.items[1];
-        if (!checkFillType(obj1.fill, obj2.fill)) {
+        var bgIndex = getBgObjectIndex(selection.items[0]);
+        var textIndex = 1 - bgIndex;
+        if (!checkObjectTypes(selection.items[bgIndex], selection.items[textIndex])) {
+            return showOnboarding();
+        } else if (!checkFillType(selection.items[bgIndex])) {
 			return;
-		} else if (!checkObjectTypes(obj1, obj2)) {
-			return showOnboarding();
 		}
 		
-		var t_i = getTextObjectIndex(obj1, obj2);
-		var r_i = 1 - t_i;
-		
-		var color = getYIQ(selection.items[r_i].fill);
-		selection.items[t_i].fill = new Color(color);
+		var color = getYIQ(selection.items[bgIndex].fill);
+		selection.items[textIndex].fill = new Color(color);
 	}
+}
+
+function checkAllowedGradient(obj) {
+    var initYIQResult;
+    for (var colorStop of obj.fill.colorStops) {
+        /* null is falsy in js */
+        if (!initYIQResult) {
+            initYIQResult = getYIQ(colorStop.color);
+        } else {
+            if (getYIQ(colorStop.color) != initYIQResult) {
+                var dialog = document.createElement("dialog");
+                dialog.innerHTML = `
+                    <form method="dialog">
+                        <h1>YIQ Contrast Finder</h1>
+                        <hr>
+                        <div>The background object has a gradient that doesn't allow a consistent YIQ result.</div>
+                        <div>Try creating a figure that only has one color so the plugin can find the correct result.</div>
+                        <footer>
+                            <button id="ok" type="submit" uxp-variant="cta">OK</button>
+                        </footer>
+                    </form>`;
+                document.appendChild(dialog);
+        
+                dialog.showModal().then(function () {
+                    dialog.remove();
+                });
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 function showOnboarding() {
@@ -67,26 +95,11 @@ function showOnboarding() {
     });
 }
 
-function checkFillType(color1, color2) {
-    if (!(color1 instanceof Color) || !(color2 instanceof Color)) {
-        var dialog = document.createElement("dialog");
-        dialog.innerHTML = `
-            <form method="dialog">
-                <h1>YIQ Contrast Finder</h1>
-                <hr>
-                <div>Text and Rectangle must both have a solid-color fill.</div>
-                <footer>
-                    <button id="ok" type="submit" uxp-variant="cta">OK</button>
-                </footer>
-            </form>`;
-        document.appendChild(dialog);
-
-        dialog.showModal().then(function () {
-            dialog.remove();
-        });
-        return false;
+function checkFillType(obj) {
+    if (obj.fill instanceof Color) {
+        return true;
     }
-    return true;
+    return checkAllowedGradient(obj);
 }
 
 function checkObjectTypes(obj1, obj2) {
@@ -103,11 +116,8 @@ function isText(obj) {
     return (obj instanceof Text);
 }
 
-function getTextObjectIndex(obj1, obj2) {
-	if (obj1 instanceof Text) {
-		return 0;
-	}
-	return 1;
+function getBgObjectIndex(obj) {
+    return (obj instanceof Text ? 1 : 0);
 }
 
 function getYIQ(color) {
